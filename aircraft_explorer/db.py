@@ -61,6 +61,6 @@ def create_tables():
 
     print("Database tables created.")
 
-# Run directly
+# Run directly to create tables if they don't exist
 if __name__ == "__main__":
     create_tables()
