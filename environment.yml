@@ -1,0 +1,15 @@
+name: Aircraftproject
+channels:
+  - defaults
+dependencies:
+  - python=3.13
+  - pylance
+  - flask
+  - requests
+  - folium
+  - plotly
+  - matplotlib
+  - sqlalchemy
+  - pandas
+  - python-dotenv
+prefix: /opt/anaconda3/envs/Aircraftproject
