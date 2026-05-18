@@ -75,3 +75,10 @@ def find_nearest_airports(lat, lon, airports_data, limit=5):
             continue
     airport_distances.sort(key=lambda x: x[0])
     return [airport for distance, airport in airport_distances[:limit]]
+import requests
+
+url = "https://opensky-network.org/api/states/all"
+
+response = requests.get(url)
+
+data = response.json()
