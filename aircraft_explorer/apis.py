@@ -1,12 +1,4 @@
 import requests
-<<<<<<< HEAD
-
-url = "https://opensky-network.org/api/states/all"
-
-response = requests.get(url)
-
-data = response.json()
-=======
 import csv
 import os
 from math import radians, sin, cos, sqrt, atan2
@@ -83,4 +75,3 @@ def find_nearest_airports(lat, lon, airports_data, limit=5):
             continue
     airport_distances.sort(key=lambda x: x[0])
     return [airport for distance, airport in airport_distances[:limit]]
->>>>>>> 07ff805caedc8a63a41bd823c99df81766d72123
