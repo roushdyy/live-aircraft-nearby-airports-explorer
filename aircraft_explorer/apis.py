@@ -6,10 +6,6 @@ from math import radians, sin, cos, sqrt, atan2
 GEOCODE_URL = "https://geocoding-api.open-meteo.com/v1/search"
 
 def geocode(city_name: str):
-    """
-    Convert a city name to its latitude and longitude.
-    Returns: (latitude, longitude, full_city_name) or (None, None, None)
-    """
     params = {
         "name": city_name,
         "count": 1,
@@ -26,6 +22,7 @@ def geocode(city_name: str):
     except Exception as e:
         print(f"[Geocoding Error] {e}")
     return None, None, None
+
 AIRPORTS_CSV_PATH = os.path.join("data", "airports.csv")
 
 def load_airports():
@@ -53,6 +50,8 @@ def load_airports():
         print(f"Error: airports.csv not found at {AIRPORTS_CSV_PATH}")
     return airports
 
+'''Hamza's code for calculating distance and finding nearest airports'''
+
 def haversine(lat1, lon1, lat2, lon2):
     """Calculates the great-circle distance between two points in kilometers."""
     R = 6371.0  # Earth radius in km
@@ -75,10 +74,4 @@ def find_nearest_airports(lat, lon, airports_data, limit=5):
             continue
     airport_distances.sort(key=lambda x: x[0])
     return [airport for distance, airport in airport_distances[:limit]]
-import requests
 
-url = "https://opensky-network.org/api/states/all"
-
-response = requests.get(url)
-
-data = response.json()
