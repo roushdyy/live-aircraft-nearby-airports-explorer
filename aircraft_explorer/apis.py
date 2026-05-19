@@ -75,3 +75,32 @@ def find_nearest_airports(lat, lon, airports_data, limit=5):
     airport_distances.sort(key=lambda x: x[0])
     return [airport for distance, airport in airport_distances[:limit]]
 
+def get_live_aircraft(lat_min, lon_min, lat_max, lon_max):
+    """Fetch live aircraft states within a bounding box."""
+    url = "https://opensky-network.org/api/states/all"
+    params = {
+        "lamin": lat_min,
+        "lomin": lon_min,
+        "lamax": lat_max,
+        "lomax": lon_max
+    }
+    try:
+        response = requests.get(url, params=params, timeout=15)
+        response.raise_for_status()
+        data = response.json()
+        states = data.get("states", [])
+        aircraft_list = []
+        for s in states:
+            if s[5] is not None and s[6] is not None:
+                aircraft_list.append({
+                    "icao24": s[0],
+                    "callsign": s[1].strip() if s[1] else "N/A",
+                    "latitude": s[6],
+                    "longitude": s[5],
+                    "altitude": s[7] if s[7] else 0,
+                    "velocity": s[9] if s[9] else 0
+                })
+        return aircraft_list
+    except Exception as e:
+        print(f"[OpenSky Error] {e}")
+        return []

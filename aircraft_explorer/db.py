@@ -11,50 +11,17 @@ def create_tables():
     cursor = conn.cursor()
 
     # User searches
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS searches (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        city TEXT NOT NULL,
-        latitude REAL,
-        longitude REAL,
-        search_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
-    """)
+    cursor.execute()
 
     # Airports
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS airports (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        airport_name TEXT,
-        icao TEXT,
-        iata TEXT,
-        latitude REAL,
-        longitude REAL
-    )
-    """)
+    cursor.execute()
 
     # Aircraft snapshots
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS aircraft_snapshots (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        callsign TEXT,
-        latitude REAL,
-        longitude REAL,
-        altitude REAL,
-        velocity REAL,
-        timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
-    """)
+    cursor.execute()
 
     # Bookmarked airports
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS saved_airports (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        airport_name TEXT,
-        icao TEXT,
-        saved_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
-    """)
+    
+    cursor.execute()
 
     conn.commit()
     conn.close()
