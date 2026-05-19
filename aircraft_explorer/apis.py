@@ -45,7 +45,7 @@ def load_airports():
                             "latitude_deg": lat,
                             "longitude_deg": lon,
                             "municipality": row.get("municipality", "N/A"),
-                            "iso_country": row.get("iso_country", "N/A")
+                            "iso_country": row.get("iso_country", "N/A") 
                         })
                 except (ValueError, TypeError):
                     continue
