@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>History</title>
+</head>
+
+<body>
+
+<h1>Search History</h1>
+
+<table border="1">
+
+<tr>
+    <th>City</th>
+    <th>Latitude</th>
+    <th>Longitude</th>
+</tr>
+
+{% for search in searches %}
+
+<tr>
+    <td>{{ search[1] }}</td>
+    <td>{{ search[2] }}</td>
+    <td>{{ search[3] }}</td>
+</tr>
+
+{% endfor %}
+
+</table>
+
+</body>
+</html>
