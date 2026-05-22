@@ -1,3 +1,7 @@
+import matplotlib
+matplotlib.use('Agg')
+
+import matplotlib.pyplot as plt
 from flask import Flask, request, render_template_string, redirect, url_for
 
 from apis import geocode, find_nearest_airports, load_airports, get_live_aircraft
@@ -79,8 +83,24 @@ def stub_map(lat, lon, nearby, aircraft):
     return f"<div>Map showing {len(nearby)} airports and {len(aircraft)} aircraft near ({lat}, {lon})</div>"
 
 def stub_chart(aircraft):
-    # Placeholder implementation for chart rendering
-    return f"<div>Chart with {len(aircraft)} aircraft</div>"
+
+    aircraft_count = len(aircraft)
+
+    plt.figure(figsize=(5, 4))
+
+    plt.bar(["Aircraft"], [aircraft_count])
+
+    plt.title("Live Aircraft Count")
+
+    plt.ylabel("Number of Aircraft")
+
+    chart_path = "static/chart.png"
+
+    plt.savefig(chart_path)
+
+    plt.close()
+
+    return f'<img src="/static/chart.png" width="500">'
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
