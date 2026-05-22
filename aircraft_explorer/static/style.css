@@ -1,3 +1,179 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
 body {
-    background-color: #f5f5f5;
+    font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+    background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+    min-height: 100vh;
+    padding: 2rem 1rem;
+    color: #1e2a3e;
+}
+
+h2, h3 {
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    letter-spacing: -0.3px;
+}
+
+h2 {
+    font-size: 2rem;
+    color: #0b3b5f;
+    border-left: 5px solid #e63946;
+    padding-left: 1rem;
+}
+
+h3 {
+    font-size: 1.6rem;
+    color: #1e6091;
+    margin-top: 0.5rem;
+}
+
+form {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 20px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+    margin: 1rem 0 1.5rem;
+}
+
+input[type="text"] {
+    flex: 3;
+    min-width: 200px;
+    padding: 12px 18px;
+    border: 1px solid #ced4da;
+    border-radius: 40px;
+    font-size: 1rem;
+    transition: 0.2s;
+}
+
+input[type="text"]:focus {
+    outline: none;
+    border-color: #e63946;
+    box-shadow: 0 0 0 3px rgba(230,57,70,0.2);
+}
+
+button {
+    background: #e63946;
+    color: white;
+    border: none;
+    padding: 12px 28px;
+    border-radius: 40px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+button:hover {
+    background: #b91c2c;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px rgba(0,0,0,0.1);
+}
+
+a {
+    display: inline-block;
+    background: #1e6091;
+    color: white;
+    text-decoration: none;
+    padding: 8px 20px;
+    border-radius: 40px;
+    font-weight: 500;
+    transition: 0.2s;
+    margin: 0.25rem;
+}
+
+a:hover {
+    background: #0b3b5f;
+    transform: translateY(-1px);
+}
+
+a[href="/history"] {
+    background: #2c6e49;
+}
+
+a[href="/history"]:hover {
+    background: #1e4a2f;
+}
+
+a[href="/"], a[href="/history"]:not(:first-of-type) {
+    background: #6c757d;
+}
+
+a[href="/"]:hover, a[href="/history"]:hover {
+    background: #495057;
+}
+
+p {
+    background: white;
+    padding: 0.8rem 1.2rem;
+    border-radius: 40px;
+    display: inline-block;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    margin: 0.5rem 0 1rem;
+    font-weight: 500;
+}
+
+div:has(> div) {  
+    background: white;
+    border-radius: 24px;
+    padding: 1rem;
+    margin: 1.5rem 0;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    border: 1px solid #dee2e6;
+}
+
+ul {
+    list-style: none;
+    background: white;
+    border-radius: 20px;
+    padding: 0;
+    margin: 1.5rem 0;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    overflow: hidden;
+}
+
+li {
+    padding: 1rem 1.2rem;
+    border-bottom: 1px solid #e9ecef;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+li:last-child {
+    border-bottom: none;
+}
+
+li a {
+    background: #e63946;
+    padding: 5px 16px;
+    font-size: 0.85rem;
+}
+
+li a:hover {
+    background: #b91c2c;
+}
+
+@media (max-width: 700px) {
+    body {
+        padding: 1rem;
+    }
+    form {
+        flex-direction: column;
+    }
+    button, input[type="text"] {
+        width: 100%;
+    }
+    li {
+        flex-direction: column;
+        text-align: center;
+    }
 }

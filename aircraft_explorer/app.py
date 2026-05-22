@@ -14,13 +14,21 @@ db.create_tables()  # Only run this during initial setup or migrations
 @app.route('/')
 def index():
     return render_template_string('''
-        <h2>Live Aircraft Explorer</h2>
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Live Aircraft Explorer</title>
+        <link rel="stylesheet" href="/static/style.css">
+    </head>
+    <body>
+        <h2>✈ Live Aircraft Explorer</h2>
         <form action="/search" method="post">
             <input name="city" placeholder="City name" required>
             <button type="submit">Search</button>
         </form>
-        <br>
         <a href="/history">View Search History</a>
+    </body>
+    </html>
     ''')
 
 @app.route('/search', methods=['POST'])
@@ -47,29 +55,59 @@ def search():
     chart_html = stub_chart(aircraft)
 
     return f'''
-    <h3>Results for {city_name}</h3>
-    <p>Nearby airports: {len(nearby)} | Live aircraft: {len(aircraft)}</p>
-    {map_html}
-    {chart_html}
-    <br>
-    <a href="/">New search</a> | <a href="/history">History</a>
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Results for {city_name}</title>
+        <link rel="stylesheet" href="/static/style.css">
+    </head>
+    <body>
+        <h3>✈ Results for {city_name}</h3>
+        <p>Nearby airports: {len(nearby)} | Live aircraft: {len(aircraft)}</p>
+        {map_html}
+        {chart_html}
+        <br>
+        <a href="/">New search</a>
+        <a href="/history">History</a>
+    </body>
+    </html>
     '''
 
 @app.route('/history')
 def history():
     rows = get_search_history(limit=30)
     if not rows:
-        return 'No searches yet. <a href="/">Go search</a>'
+        return '''
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>History</title>
+            <link rel="stylesheet" href="/static/style.css">
+        </head>
+        <body>
+            <p>No searches yet. <a href="/">Go search</a></p>
+        </body>
+        </html>
+        '''
     template = '''
-    <h3>Search History</h3>
-    <ul>
-    {% for r in rows %}
-        <li>{{ r.city }} at {{ r.search_time }}
-            <a href="{{ url_for('delete_record', search_id=r.id) }}" onclick="return confirm('Delete?')">[delete]</a>
-        </li>
-    {% endfor %}
-    </ul>
-    <a href="/">Back</a>
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Search History</title>
+        <link rel="stylesheet" href="/static/style.css">
+    </head>
+    <body>
+        <h3>📜 Search History</h3>
+        <ul>
+        {% for r in rows %}
+            <li>{{ r.city }} at {{ r.search_time }}
+                <a href="{{ url_for('delete_record', search_id=r.id) }}" onclick="return confirm('Delete?')">delete</a>
+            </li>
+        {% endfor %}
+        </ul>
+        <a href="/">Back to Search</a>
+    </body>
+    </html>
     '''
     return render_template_string(template, rows=rows)
 
