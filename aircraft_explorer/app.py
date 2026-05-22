@@ -83,6 +83,4 @@ def stub_chart(aircraft):
     return f"<div>Chart with {len(aircraft)} aircraft</div>"
 
 if __name__ == '__main__':
-    # Uncomment the next line to create tables during initial setup
-    # db.create_tables()
     app.run(debug=True, port=5000)
