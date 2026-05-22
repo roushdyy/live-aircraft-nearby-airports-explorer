@@ -5,7 +5,7 @@ from control_panel import save_search, get_search_history, delete_search
 import db
 
 app = Flask(__name__)
-# db.create_tables()  # Only run this during initial setup or migrations
+db.create_tables()  # Only run this during initial setup or migrations
 
 @app.route('/')
 def index():
