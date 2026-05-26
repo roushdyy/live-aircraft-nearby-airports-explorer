@@ -1,117 +1,114 @@
 import sqlite3
-from typing import List, Dict, Optional, Any
+from typing import List, Dict
 
-DB_NAME = "aircraft.db"
+DB = "aircraft.db"
 
-def connect_db():
-    return sqlite3.connect(DB_NAME)
+def connect():
+    return sqlite3.connect(DB)
 
-# ========== SEARCH HISTORY ==========
-def save_search(city: str, lat: float, lon: float) -> int:
-    conn = connect_db()
-    cur = conn.cursor()
-    cur.execute("INSERT INTO searches (city, latitude, longitude, search_time) VALUES (?, ?, ?, CURRENT_TIMESTAMP)", (city, lat, lon))
+# -------- Search history --------
+def save_search(city, lat, lon):
+    conn = connect()
+    c = conn.cursor()
+    c.execute("INSERT INTO searches (city, latitude, longitude) VALUES (?,?,?)", (city, lat, lon))
     conn.commit()
-    last_id = cur.lastrowid
     conn.close()
-    return last_id
 
-def get_search_history(limit: int = 20) -> List[dict]:
-    conn = connect_db()
+def get_searches(limit=20):
+    conn = connect()
     conn.row_factory = sqlite3.Row
-    cur = conn.cursor()
-    cur.execute("SELECT id, city, latitude, longitude, search_time FROM searches ORDER BY search_time DESC LIMIT ?", (limit,))
-    rows = cur.fetchall()
+    c = conn.cursor()
+    c.execute("SELECT id, city, latitude, longitude, timestamp FROM searches ORDER BY timestamp DESC LIMIT ?", (limit,))
+    rows = c.fetchall()
     conn.close()
-    return [dict(r) for r in rows]
+    return [dict(row) for row in rows]
 
-def delete_search(search_id: int) -> bool:
-    conn = connect_db()
-    cur = conn.cursor()
-    cur.execute("DELETE FROM searches WHERE id = ?", (search_id,))
+def delete_search(search_id):
+    conn = connect()
+    c = conn.cursor()
+    c.execute("DELETE FROM searches WHERE id = ?", (search_id,))
     conn.commit()
-    deleted = cur.rowcount > 0
     conn.close()
-    return deleted
 
-# ========== AIRCRAFT SNAPSHOTS ==========
-def save_multiple_aircraft_snapshots(aircraft_list: List[dict]) -> int:
-    if not aircraft_list:
-        return 0
-    conn = connect_db()
-    cur = conn.cursor()
-    data = [(a.get("callsign", "N/A"), a.get("latitude"), a.get("longitude"), a.get("altitude"), a.get("velocity")) for a in aircraft_list]
-    cur.executemany("INSERT INTO aircraft_snapshots (callsign, latitude, longitude, altitude, velocity, timestamp) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)", data)
-    conn.commit()
-    count = cur.rowcount
-    conn.close()
-    return count
-
-def get_aircraft_snapshots(limit: int = 100) -> List[dict]:
-    conn = connect_db()
-    conn.row_factory = sqlite3.Row
-    cur = conn.cursor()
-    cur.execute("SELECT id, callsign, latitude, longitude, altitude, velocity, timestamp FROM aircraft_snapshots ORDER BY timestamp DESC LIMIT ?", (limit,))
-    rows = cur.fetchall()
-    conn.close()
-    return [dict(r) for r in rows]
-
-# ========== BOOKMARKED AIRPORTS ==========
-def save_bookmarked_airport(airport_name: str, icao: str) -> int:
-    conn = connect_db()
-    cur = conn.cursor()
-    cur.execute("SELECT id FROM saved_airports WHERE icao = ?", (icao,))
-    if cur.fetchone():
+# -------- Bookmarked airports --------
+def save_bookmark(name, icao, lat, lon):
+    conn = connect()
+    c = conn.cursor()
+    try:
+        c.execute("INSERT INTO saved_airports (airport_name, icao, latitude, longitude) VALUES (?,?,?,?)", (name, icao, lat, lon))
+        conn.commit()
+        return True
+    except sqlite3.IntegrityError:
+        return False  # already exists
+    finally:
         conn.close()
-        return -1
-    cur.execute("INSERT INTO saved_airports (airport_name, icao, saved_time) VALUES (?, ?, CURRENT_TIMESTAMP)", (airport_name, icao))
-    conn.commit()
-    last_id = cur.lastrowid
-    conn.close()
-    return last_id
 
-def get_bookmarked_airports() -> List[dict]:
-    conn = connect_db()
+def get_bookmarks():
+    conn = connect()
     conn.row_factory = sqlite3.Row
-    cur = conn.cursor()
-    cur.execute("SELECT id, airport_name, icao, saved_time FROM saved_airports ORDER BY saved_time DESC")
-    rows = cur.fetchall()
+    c = conn.cursor()
+    c.execute("SELECT id, airport_name, icao, latitude, longitude, saved_time FROM saved_airports ORDER BY saved_time DESC")
+    rows = c.fetchall()
     conn.close()
-    return [dict(r) for r in rows]
+    return [dict(row) for row in rows]
 
-def delete_bookmarked_airport(airport_id: int) -> bool:
-    conn = connect_db()
-    cur = conn.cursor()
-    cur.execute("DELETE FROM saved_airports WHERE id = ?", (airport_id,))
+def delete_bookmark(bookmark_id):
+    conn = connect()
+    c = conn.cursor()
+    c.execute("DELETE FROM saved_airports WHERE id = ?", (bookmark_id,))
     conn.commit()
-    deleted = cur.rowcount > 0
     conn.close()
-    return deleted
 
-# ========== COMPARE TRAFFIC ==========
-def compare_traffic(current_aircraft_list: List[dict]) -> dict:
-    result = {"current_count": len(current_aircraft_list), "previous_count": 0, "new_aircraft": [], "disappeared_aircraft": [], "common_count": 0, "timestamp_previous": None}
-    conn = connect_db()
-    cur = conn.cursor()
-    cur.execute("SELECT timestamp FROM aircraft_snapshots ORDER BY timestamp DESC LIMIT 1")
-    row = cur.fetchone()
-    if row:
-        result["timestamp_previous"] = row[0]
-        cur.execute("SELECT DISTINCT callsign FROM aircraft_snapshots WHERE timestamp = ?", (row[0],))
-        prev_callsigns = {r[0] for r in cur.fetchall()}
-        result["previous_count"] = len(prev_callsigns)
-        curr_callsigns = {a.get("callsign") for a in current_aircraft_list if a.get("callsign")}
-        result["new_aircraft"] = list(curr_callsigns - prev_callsigns)
-        result["disappeared_aircraft"] = list(prev_callsigns - curr_callsigns)
-        result["common_count"] = len(curr_callsigns & prev_callsigns)
+# -------- Aircraft snapshots --------
+def save_snapshots(aircraft_list):
+    """Save multiple aircraft records (each as one row)"""
+    if not aircraft_list:
+        return
+    conn = connect()
+    c = conn.cursor()
+    data = [(a["callsign"], a["latitude"], a["longitude"], a["altitude"], a["velocity"]) for a in aircraft_list]
+    c.executemany("INSERT INTO aircraft_snapshots (callsign, latitude, longitude, altitude, velocity) VALUES (?,?,?,?,?)", data)
+    conn.commit()
     conn.close()
-    return result
 
-def get_snapshot_list(limit: int = 20) -> List[dict]:
-    conn = connect_db()
+def get_snapshots(limit=50):
+    conn = connect()
     conn.row_factory = sqlite3.Row
-    cur = conn.cursor()
-    cur.execute("SELECT timestamp, COUNT(*) as aircraft_count FROM aircraft_snapshots GROUP BY timestamp ORDER BY timestamp DESC LIMIT ?", (limit,))
-    rows = cur.fetchall()
+    c = conn.cursor()
+    c.execute("SELECT id, callsign, altitude, velocity, timestamp FROM aircraft_snapshots ORDER BY timestamp DESC LIMIT ?", (limit,))
+    rows = c.fetchall()
     conn.close()
-    return [dict(r) for r in rows]
+    return [dict(row) for row in rows]
+
+def get_distinct_timestamps():
+    """Return list of unique snapshot timestamps for comparison dropdown"""
+    conn = connect()
+    c = conn.cursor()
+    c.execute("SELECT DISTINCT timestamp FROM aircraft_snapshots ORDER BY timestamp DESC LIMIT 20")
+    rows = c.fetchall()
+    conn.close()
+    return [row[0] for row in rows]
+
+def get_aircraft_by_timestamp(ts):
+    """Return all aircraft from a given snapshot timestamp"""
+    conn = connect()
+    conn.row_factory = sqlite3.Row
+    c = conn.cursor()
+    c.execute("SELECT callsign FROM aircraft_snapshots WHERE timestamp = ?", (ts,))
+    rows = c.fetchall()
+    conn.close()
+    return [dict(row) for row in rows]
+
+def compare_traffic(current_aircraft, previous_timestamp):
+    """Compare current aircraft callsigns with a past snapshot"""
+    current_callsigns = {a["callsign"] for a in current_aircraft if a["callsign"] != "N/A"}
+    prev_aircraft = get_aircraft_by_timestamp(previous_timestamp)
+    prev_callsigns = {a["callsign"] for a in prev_aircraft if a["callsign"] != "N/A"}
+    return {
+        "current_count": len(current_callsigns),
+        "previous_count": len(prev_callsigns),
+        "new": list(current_callsigns - prev_callsigns),
+        "disappeared": list(prev_callsigns - current_callsigns),
+        "common": len(current_callsigns & prev_callsigns),
+        "previous_timestamp": previous_timestamp
+    }

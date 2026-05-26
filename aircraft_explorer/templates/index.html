@@ -14,7 +14,7 @@
 
     <h1>Live Aircraft Explorer</h1>
 
-    <form method="POST">
+    <form action="/search" method="POST">
 
         <input
         type="text"
@@ -27,7 +27,11 @@
         </button>
 
     </form>
-
+    {% if nearby_count is defined %}
+        <div class="alert alert-info mt-3">
+            Nearby airports: {{ nearby_count }} | Live aircraft: {{ aircraft_data|length if aircraft_data else 0 }}
+        </div>
+    {% endif %}
     {% if map_html %}
 
         <h2 class="mt-4">Map</h2>

@@ -1,7 +1,7 @@
 import folium
 
 
-def create_map(lat, lon, aircraft_data):
+def make_map(lat, lon, nearby_airports, aircraft_data):
 
     my_map = folium.Map(
         location=[lat, lon],
@@ -14,6 +14,18 @@ def create_map(lat, lon, aircraft_data):
         popup="Selected City",
         tooltip="City"
     ).add_to(my_map)
+
+    # Nearby airport markers
+    for airport in nearby_airports:
+        folium.CircleMarker(
+            [airport["latitude_deg"], airport["longitude_deg"]],
+            radius=5,
+            color="blue",
+            fill=True,
+            fill_color="blue",
+            fill_opacity=0.7,
+            popup=f"Airport: {airport['name']} ({airport['ident']})"
+        ).add_to(my_map)
 
     # Aircraft markers
     for aircraft in aircraft_data:

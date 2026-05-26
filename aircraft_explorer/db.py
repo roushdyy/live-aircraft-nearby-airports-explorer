@@ -27,6 +27,7 @@ def create_tables():
     CREATE TABLE IF NOT EXISTS saved_airports (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         airport_name TEXT,
+        icao TEXT,
         latitude REAL,
         longitude REAL
     )
