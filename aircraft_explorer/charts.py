@@ -1,25 +1,22 @@
+from turtle import home
 import matplotlib.pyplot as plt
+import os
 
+def altitude_chart(aircraft_list):
+    altitudes = [a['altitude'] for a in aircraft_list if a['altitude'] is not None and a['altitude'] > 0]
+    
+    if not altitudes:   
+        return home
 
-def create_chart(aircraft_count):
-
-    hours = ["Now"]
-    values = [aircraft_count]
-
-    plt.figure(figsize=(5, 4))
-
-    plt.bar(hours, values)
-
-    plt.title("Aircraft Count")
-
-    plt.xlabel("Time")
-
-    plt.ylabel("Aircraft")
-
-    chart_path = "static/chart.png"
-
-    plt.savefig(chart_path)
-
+    plt.figure(figsize=(8, 4))
+    plt.hist(altitudes, bins=15, color='skyblue', edgecolor='black')
+    plt.title("Altitude Distribution of Nearby Aircraft")
+    plt.xlabel("Altitude (meeters)")
+    plt.ylabel("Number of Aircraft")   
+    plt.grid(True, alpha=0.3)
+    os.makedirs("static", exist_ok=True)
+    path = "static/altitude_hist.png"
+    plt.savefig(path)
     plt.close()
-
-    return chart_path
+        
+    return path

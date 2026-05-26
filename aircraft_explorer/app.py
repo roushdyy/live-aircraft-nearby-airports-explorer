@@ -1,15 +1,13 @@
 import matplotlib
 matplotlib.use('Agg')
 
-import matplotlib.pyplot as plt
 from flask import Flask, request, render_template_string, redirect, url_for
-
 from apis import geocode, find_nearest_airports, load_airports, get_live_aircraft
-from control_panel import save_search, get_search_history, delete_search
-import db
+from control_panel import save_search, get_searches, delete_search, save_bookmark, get_bookmarks, delete_bookmark, save_snapshot, get_distinct_timestamps, compare_traffic
 
-app = Flask(__name__)
-db.create_tables()  # Only run this during initial setup or migrations
+from map_utils import make_map
+from charts import altitude_chart
+import db
 
 @app.route('/')
 def index():
