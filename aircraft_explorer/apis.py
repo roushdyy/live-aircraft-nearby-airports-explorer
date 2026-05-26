@@ -5,6 +5,8 @@ from math import radians, sin, cos, sqrt, atan2
 
 GEOCODE_URL = "https://geocoding-api.open-meteo.com/v1/search"
 
+AIRPORTS_CSV_PATH = os.path.join(os.path.dirname(__file__), "data", "airports.csv")
+
 def geocode(city_name: str):
     params = {
         "name": city_name,
