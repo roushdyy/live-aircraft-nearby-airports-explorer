@@ -1,6 +1,7 @@
 import sqlite3
+import os
 
-DATABASE = "aircraft.db"
+DATABASE = os.path.join(os.path.dirname(__file__), "aircraft.db")
 
 
 def connect_db():

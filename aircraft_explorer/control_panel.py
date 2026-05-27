@@ -1,7 +1,8 @@
 import sqlite3
+import os
 from typing import List, Dict
 
-DB = "aircraft.db"
+DB = os.path.join(os.path.dirname(__file__), "aircraft.db")
 
 def connect():
     return sqlite3.connect(DB)
