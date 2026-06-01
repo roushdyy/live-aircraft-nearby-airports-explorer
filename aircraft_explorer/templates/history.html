@@ -19,9 +19,9 @@
 {% for search in searches %}
 
 <tr>
-    <td>{{ search[1] }}</td>
-    <td>{{ search[2] }}</td>
-    <td>{{ search[3] }}</td>
+    <td>{{ search.city }}</td>
+    <td>{{ search.latitude }}</td>
+    <td>{{ search.longitude }}</td>
 </tr>
 
 {% endfor %}
