@@ -76,7 +76,7 @@ def find_nearest_airports(lat, lon, airports_data, limit=5):
             continue
     airport_distances.sort(key=lambda x: x[0])
     return [airport for distance, airport in airport_distances[:limit]]
-
+#ahmed's code for fetching live aircraft data from OpenSky Network
 def get_live_aircraft(lat_min, lon_min, lat_max, lon_max):
     """Fetch live aircraft states within a bounding box."""
     url = "https://opensky-network.org/api/states/all"
