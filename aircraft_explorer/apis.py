@@ -1,11 +1,10 @@
 import requests
 import csv
-import os
+from io import StringIO
 from math import radians, sin, cos, sqrt, atan2
 
 GEOCODE_URL = "https://geocoding-api.open-meteo.com/v1/search"
-
-AIRPORTS_CSV_PATH = os.path.join(os.path.dirname(__file__), "data", "airports.csv")
+OURAIRPORTS_AIRPORTS_URL = "https://ourairports.com/data/airports.csv"
 
 def geocode(city_name: str):
     params = {
@@ -27,28 +26,31 @@ def geocode(city_name: str):
 
 
 def load_airports():
-    """Loads airport data from the CSV file into a list of dictionaries."""
+    """Loads airport data from OurAirports CSV via remote API into a list of dictionaries."""
     airports = []
     try:
-        with open(AIRPORTS_CSV_PATH, mode='r', encoding='utf-8') as file:
-            reader = csv.DictReader(file)
-            for row in reader:
-                try:
-                    lat = float(row.get("latitude_deg", 0))
-                    lon = float(row.get("longitude_deg", 0))
-                    if lat != 0 and lon != 0:
-                        airports.append({
-                            "name": row.get("name", "Unknown"),
-                            "ident": row.get("ident", "N/A"),
-                            "latitude_deg": lat,
-                            "longitude_deg": lon,
-                            "municipality": row.get("municipality", "N/A"),
-                            "iso_country": row.get("iso_country", "N/A") 
-                        })
-                except (ValueError, TypeError):
-                    continue
-    except FileNotFoundError:
-        print(f"Error: airports.csv not found at {AIRPORTS_CSV_PATH}")
+        response = requests.get(OURAIRPORTS_AIRPORTS_URL, timeout=30)
+        response.raise_for_status()
+        reader = csv.DictReader(StringIO(response.text))
+    except Exception as e:
+        print(f"[OurAirports Error] {e}. Airports data unavailable.")
+        return airports
+
+    for row in reader:
+        try:
+            lat = float(row.get("latitude_deg", 0))
+            lon = float(row.get("longitude_deg", 0))
+            if lat != 0 and lon != 0:
+                airports.append({
+                    "name": row.get("name", "Unknown"),
+                    "ident": row.get("ident", "N/A"),
+                    "latitude_deg": lat,
+                    "longitude_deg": lon,
+                    "municipality": row.get("municipality", "N/A"),
+                    "iso_country": row.get("iso_country", "N/A")
+                })
+        except (ValueError, TypeError):
+            continue
     return airports
 
 '''Hamza's code for calculating distance and finding nearest airports'''
