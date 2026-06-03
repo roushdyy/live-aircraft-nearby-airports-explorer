@@ -1,15 +1,15 @@
 import sqlite3
 import os
 
-DATABASE = os.path.join(os.path.dirname(__file__), "aircraft.db")
+DB = os.path.join(os.path.dirname(__file__), "aircraft.db")
 
 
-def connect_db():
-    return sqlite3.connect(DATABASE)
+def connect():
+    return sqlite3.connect(DB)
 
 
 def create_tables():
-    conn = connect_db()
+    conn = connect()
     cursor = conn.cursor()
 
     # Search history table
@@ -56,29 +56,3 @@ def create_tables():
 
     conn.commit()
     conn.close()
-
-
-def save_search(city, lat, lon):
-    conn = connect_db()
-    cursor = conn.cursor()
-
-    cursor.execute("""
-    INSERT INTO searches (city, latitude, longitude)
-    VALUES (?, ?, ?)
-    """, (city, lat, lon))
-
-    conn.commit()
-    conn.close()
-
-
-def get_searches():
-    conn = connect_db()
-    cursor = conn.cursor()
-
-    cursor.execute("SELECT * FROM searches ORDER BY timestamp DESC")
-
-    results = cursor.fetchall()
-
-    conn.close()
-
-    return results
