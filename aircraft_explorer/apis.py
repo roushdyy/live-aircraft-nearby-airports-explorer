@@ -25,7 +25,6 @@ def geocode(city_name: str):
         print(f"[Geocoding Error] {e}")
     return None, None, None
 
-AIRPORTS_CSV_PATH = os.path.join("data", "airports.csv")
 
 def load_airports():
     """Loads airport data from the CSV file into a list of dictionaries."""
