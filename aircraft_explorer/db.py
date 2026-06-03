@@ -30,9 +30,16 @@ def create_tables():
         airport_name TEXT,
         icao TEXT,
         latitude REAL,
-        longitude REAL
+        longitude REAL,
+        saved_time DATETIME DEFAULT CURRENT_TIMESTAMP
     )
     """)
+
+    # Ensure older DBs gain the saved_time column if it was added later
+    cursor.execute("PRAGMA table_info(saved_airports)")
+    columns = [row[1] for row in cursor.fetchall()]
+    if 'saved_time' not in columns:
+        cursor.execute("ALTER TABLE saved_airports ADD COLUMN saved_time DATETIME DEFAULT CURRENT_TIMESTAMP")
 
     # Aircraft snapshots
     cursor.execute("""

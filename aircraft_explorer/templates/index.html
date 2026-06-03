@@ -42,6 +42,44 @@
 
     {% endif %}
 
+    {% if nearby %}
+
+        <h2 class="mt-4">Nearby Airports</h2>
+        <div class="table-responsive">
+            <table class="table table-sm table-striped">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>ICAO</th>
+                        <th>Latitude</th>
+                        <th>Longitude</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for airport in nearby %}
+                    <tr>
+                        <td>{{ airport.name }}</td>
+                        <td>{{ airport.ident }}</td>
+                        <td>{{ airport.latitude_deg }}</td>
+                        <td>{{ airport.longitude_deg }}</td>
+                        <td>
+                            <form action="/bookmark" method="POST" class="d-inline">
+                                <input type="hidden" name="airport_name" value="{{ airport.name }}">
+                                <input type="hidden" name="icao" value="{{ airport.ident }}">
+                                <input type="hidden" name="latitude" value="{{ airport.latitude_deg }}">
+                                <input type="hidden" name="longitude" value="{{ airport.longitude_deg }}">
+                                <button type="submit" class="btn btn-sm btn-outline-primary">Bookmark</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    {% endif %}
+
     {% if aircraft_data %}
 
         <h2 class="mt-4">Aircraft</h2>

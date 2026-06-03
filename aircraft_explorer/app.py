@@ -1,7 +1,8 @@
+import os
 import matplotlib
 matplotlib.use('Agg')  # for headless environments
 
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, session
 from apis import geocode, load_airports, find_nearest_airports, get_live_aircraft
 from control_panel import (
     save_search, get_searches, delete_search,
@@ -13,6 +14,7 @@ from charts import altitude_chart
 import db
 
 app = Flask(__name__)
+app.secret_key = os.environ.get('SECRET_KEY', 'dev_secret_key')
 db.create_tables()  # ensure tables exist
 
 @app.route('/')
@@ -41,6 +43,9 @@ def search():
     max_lon = lon + bbox
     aircraft = get_live_aircraft(min_lat, min_lon, max_lat, max_lon)
 
+    # Save the current aircraft in session for comparison later
+    session['current_aircraft'] = aircraft
+
     # Save snapshot for later comparison
     save_snapshots(aircraft)
 
@@ -54,7 +59,18 @@ def search():
                            map_html=map_html,
                            chart=chart_path,
                            aircraft_data=aircraft,
+                           nearby=nearby,
                            nearby_count=len(nearby))
+
+@app.route('/bookmark', methods=['POST'])
+def bookmark():
+    airport_name = request.form.get('airport_name')
+    icao = request.form.get('icao')
+    latitude = request.form.get('latitude')
+    longitude = request.form.get('longitude')
+    if airport_name and icao and latitude and longitude:
+        save_bookmark(airport_name, icao, latitude, longitude)
+    return redirect(url_for('control_panel'))
 
 @app.route('/history')
 def history():
@@ -84,6 +100,24 @@ def compare():
     if not previous_ts:
         return redirect(url_for('control_panel'))
     
-    return "Please perform a search first, then use comparison. <a href='/'>Go to search</a>"
+    # Retrieve current aircraft from session (set during search)
+    current_aircraft = session.get('current_aircraft', [])
+    if not current_aircraft:
+        return render_template('control.html', 
+                               bookmarked=get_bookmarks(),
+                               snapshots=get_snapshots(20),
+                               timestamps=get_distinct_timestamps(),
+                               comparison=None,
+                               error="Please perform a search first to get current aircraft data.")
+    
+    # Perform comparison
+    comp = compare_traffic(current_aircraft, previous_ts)
+    
+    # Re-fetch data for the control panel to display again
+    return render_template('control.html',
+                           bookmarked=get_bookmarks(),
+                           snapshots=get_snapshots(20),
+                           timestamps=get_distinct_timestamps(),
+                           comparison=comp)
 if __name__ == '__main__':
     app.run(debug=True, port=5001)
